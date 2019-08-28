@@ -1,0 +1,177 @@
+﻿@using Microsoft.Extensions.Configuration
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@inject IConfiguration Configuration
+
+@section Styles{
+    <style type="text/css">
+        .el-input-group__prepend {
+            width: 220px !important;
+            text-align: right !important;
+        }
+
+        #container .el-row {
+            margin: 10px 0px !important;
+        }
+    </style>
+}
+<div id="container">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+        <el-form-item label="数据库连接：" prop="connectionString">
+            <el-input v-model="ruleForm.connectionString" clearable @@input="forceUpdateInput" placeholder="请输入数据库连接字符串">
+            </el-input>
+        </el-form-item>
+        <el-row>
+            <el-col :span="12">
+                <el-form-item label="项目名称：" prop="solutionName">
+                    <el-input v-model="ruleForm.solutionName" clearable @@input="forceUpdateInput" placeholder="请输入项目名称">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="文件输出路径：" prop="outputPath">
+                    <el-input v-model="ruleForm.outputPath" clearable @@input="forceUpdateInput">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12">
+                <el-form-item label="Models Namespace：" prop="modelsNamespace">
+                    <el-input v-model="ruleForm.modelsNamespace" clearable @@input="forceUpdateInput">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="ViewModels Namespace：" prop="viewmodelsNamespace">
+                    <el-input v-model="ruleForm.viewmodelsNamespace" clearable @@input="forceUpdateInput">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12">
+                <el-form-item label="IRepositories Namespace：" prop="iRepositoriesNamespace">
+                    <el-input v-model="ruleForm.iRepositoriesNamespace" clearable @@input="forceUpdateInput">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="Repositories Namespace：" prop="repositoriesNamespace">
+                    <el-input v-model="ruleForm.repositoriesNamespace" clearable @@input="forceUpdateInput">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12">
+                <el-form-item label="IServices Namespace：" prop="iServicesNamespace">
+                    <el-input v-model="ruleForm.iServicesNamespace" clearable @@input="forceUpdateInput">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="Services Namespace：" prop="servicesNamespace">
+                    <el-input v-model="ruleForm.servicesNamespace" clearable @@input="forceUpdateInput">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-form-item style="text-align: center;">
+            <el-button icon="el-icon-connection" type="success" @@click="connectDatabase('@Url.Action("GetDataTables")');">获取表结构</el-button>
+            <el-button icon="el-icon-download" type="success" @@click="submitForm('@Url.Action("Generate")')">一键生成</el-button>
+            <el-button @@click="resetForm('ruleForm')" icon="el-icon-refresh-left" type="warning">重置</el-button>
+        </el-form-item>
+        <el-form-item prop="tableData">
+            <template>
+                <el-table v-loading="loading"
+                          :data="ruleForm.tableData"
+                          height="500"
+                          border
+                          style="width: 100%"
+                          id="tableList">
+                    <el-table-column type="expand" title="展开查看字段明细">
+                        <template slot-scope="scope">
+                            <el-table :data="scope.row.columns"
+                                      border
+                                      style="width: 100%">
+                                <el-table-column prop="colName"
+                                                 label="列名">
+                                </el-table-column>
+                                <el-table-column prop="isPrimaryKey"
+                                                 label="主键">
+                                    <template slot-scope="props">
+                                        {{ props.row.isPrimaryKey }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="columnType"
+                                                 label="数据类型">
+                                </el-table-column>
+                                <el-table-column prop="cSharpType"
+                                                 label="C#类型">
+                                    <template slot-scope="props">
+                                        <el-input clearable @@input="forceUpdateInput" v-model="props.row.cSharpType">
+                                        </el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="isIdentity"
+                                                 label="自增">
+                                    <template slot-scope="props">
+                                        {{ props.row.isIdentity }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="isNullable"
+                                                 label="可空">
+                                    <template slot-scope="props">
+                                        {{ props.row.isNullable }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="comments"
+                                                 label="备注">
+                                    <template slot-scope="props">
+                                        <el-input clearable @@input="forceUpdateInput" v-model="props.row.comments">
+                                        </el-input>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="tableName"
+                                     label="表名"
+                                     width="300">
+                    </el-table-column>
+                    <el-table-column prop="tableComment"
+                                     label="描述">
+                        <template slot-scope="scope">
+                            <el-input clearable @@input="forceUpdateInput" v-model="scope.row.tableComment">
+
+                            </el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作"
+                                     width="120">
+                        <template slot-scope="scope">
+                            <el-tooltip effect="dark" content="移除" placement="top">
+                                <el-button @@click.native.prevent="deleteRow(scope.$index, tableData)"
+                                           type="warning"
+                                           size="small" icon="el-icon-delete">
+                                </el-button>
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </template>
+        </el-form-item>
+    </el-form>
+</div>
+
+@section Scripts
+{
+    @*<script type="text/javascript" src="~/js/home/index.js">
+        </script>*@
+    <script type="text/javascript">
+        app.ruleForm.connectionString = '@Configuration.GetConnectionString("MsSqlServer")';
+    </script>
+}

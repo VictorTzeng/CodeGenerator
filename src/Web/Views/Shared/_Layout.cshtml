@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Web</title>
+
+    <link rel="stylesheet" href="~/lib/element-ui/2.11.1/index.css" />
+    <style>
+        *{ padding:0; margin:0}
+        body,html{ height:100%;}
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+  
+        .el-aside {
+            color: #333;
+        }
+        .aside-expand {
+            width: 300px !important;
+        }
+        .aside-collapse {
+            width: 64px !important;
+            overflow-x: hidden !important;
+        }
+    </style>
+    @RenderSection("Styles")
+</head>
+<body>
+    <el-container id="app" style="margin:0 auto; height: 100%; background-color: rgb(238, 241, 246);">
+        <el-aside style="height: 100%;" :class="asideClass">
+            <el-menu :default-openeds="['1']" style="height: 100%;" :collapse="isCollapse" :unique-opened="true">
+                <el-menu-item index="1">
+                    <i class="el-icon-menu"></i>
+                    <span slot="title">代码生成器</span>
+                </el-menu-item>
+            </el-menu>
+        </el-aside>
+
+        <el-container>
+            <el-header style="font-size: 12px">
+                <el-row>
+                    <el-col :span="12">
+                        <el-button :icon="showOrHideMenuIcon" type="primary" v-on:click="showOrHideMenu" :title="showOrHideMenuTitle"></el-button>
+                    </el-col>
+                    <el-col :span="12" style="text-align: right;">
+                        <el-dropdown>
+                            <i class="el-icon-setting" style="margin-right: 15px"></i>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item>查看</el-dropdown-item>
+                                <el-dropdown-item>新增</el-dropdown-item>
+                                <el-dropdown-item>删除</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                        <span>王小虎</span>
+                    </el-col>
+                </el-row>
+
+            </el-header>
+
+            <el-main>
+                @RenderBody()
+            </el-main>
+        </el-container>
+    </el-container>
+
+    <script src="~/lib/axios/axios.min.js"></script>
+    <script src="~/lib/vue/2.6.10/vue.js"></script>
+    <script src="~/lib/vuelidate/vuelidate.min.js"></script>
+    <script src="~/lib/element-ui/2.11.1/index.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+    <script type="text/javascript">
+        app.$mount("#app");
+    </script>
+</body>
+</html>
