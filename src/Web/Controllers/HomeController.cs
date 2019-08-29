@@ -52,7 +52,7 @@ namespace Web.Controllers
             if (ModelState.IsValid)
             {
                 var instance = new CodeGenerator(input);
-                instance.Generate(input.TableData);
+                instance.Generate(input.TableData, true);
                 return Json(ExcutedResult.SuccessResult("生成成功"));
             }
             return Json(ExcutedResult.SuccessResult("数据验证失败，请检查后重试"));

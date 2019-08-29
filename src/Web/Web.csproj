@@ -5,21 +5,23 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Log4net\**" />
+    <Content Remove="Log4net\**" />
+    <EmbeddedResource Remove="Log4net\**" />
+    <None Remove="Log4net\**" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="Zxw.Framework.NetCore" Version="2.2.2.2" />
+    <PackageReference Include="Zxw.Framework.NetCore" Version="2.2.2.5" />
   </ItemGroup>
 
 
   <ItemGroup>
     <Folder Include="wwwroot\lib\vue\2.6.10\" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Zxw.Framework.NetCore\Zxw.Framework.NetCore\Zxw.Framework.NetCore.csproj" />
   </ItemGroup>
 
 </Project>

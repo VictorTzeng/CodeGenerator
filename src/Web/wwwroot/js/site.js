@@ -21,6 +21,8 @@ var app = new Vue({
             repositoriesNamespace: '',
             iServicesNamespace: '',
             servicesNamespace: '',
+            generateApiController:false,
+            isPascalCase:true,
             tableData: []
         },
         rules: {
@@ -31,51 +33,51 @@ var app = new Vue({
                 { required: true, message: '请输入文件输出路径', trigger: 'blur' }
             ],
             solutionName: [
-                { required: true, message: '请输入非数字开头的项目名称', trigger: 'blur' },
+                { required: true, message: '请输入非数字或者特殊字符开头的项目名称', trigger: 'blur' },
                 {
-                    pattern:/^[^0-9]+$/,message: '请输入非数字开头的项目名称', trigger: 'change'
+                    pattern:/^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$/,message: '请输入非数字或者特殊字符开头的项目名称', trigger: 'change'
                 }
             ],                                    
             modelsNamespace: [                     
-                { required: true, message: '请输入非数字开头的Model域名空间', trigger: 'blur' },
+                { required: true, message: '请输入非数字或者特殊字符开头的Model域名空间', trigger: 'blur' },
                 {
-                    pattern:/^[^0-9]+$/, message: '请输入非数字开头的Model域名空间', trigger: 'change'
+                    pattern:/^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$/, message: '请输入非数字或者特殊字符开头的Model域名空间', trigger: 'change'
                 }
             ],                                    
             controllersNamespace: [               
-                { required: true, message: '请输入非数字开头的Controller域名空间', trigger: 'blur' },
+                { required: true, message: '请输入非数字或者特殊字符开头的Controller域名空间', trigger: 'blur' },
                 {
-                    pattern:/^[^0-9]+$/,message: '请输入非数字开头的Controller域名空间', trigger: 'change'
+                    pattern:/^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$/,message: '请输入非数字或者特殊字符开头的Controller域名空间', trigger: 'change'
                 }
             ],                                    
             iRepositoriesNamespace: [             
-                { required: true, message: '请输入非数字开头的IRepository域名空间', trigger: 'blur'},
+                { required: true, message: '请输入非数字或者特殊字符开头的IRepository域名空间', trigger: 'blur'},
                 {
-                    pattern:/^[^0-9]+$/,message: '请输入非数字开头的IRepository域名空间', trigger: 'change'
+                    pattern:/^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$/,message: '请输入非数字或者特殊字符开头的IRepository域名空间', trigger: 'change'
                 }
             ],                                    
             repositoriesNamespace: [              
-                { required: true, message: '请输入非数字开头的Repository域名空间', trigger: 'blur'},
+                { required: true, message: '请输入非数字或者特殊字符开头的Repository域名空间', trigger: 'blur'},
                 {
-                    pattern:/^[^0-9]+$/,message: '请输入非数字开头的Repository域名空间', trigger: 'change'
+                    pattern:/^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$/,message: '请输入非数字或者特殊字符开头的Repository域名空间', trigger: 'change'
                 }
             ],                                    
             iServicesNamespace: [                 
-                { required: true, message: '请输入非数字开头的IService域名空间', trigger: 'blur'},
+                { required: true, message: '请输入非数字或者特殊字符开头的IService域名空间', trigger: 'blur'},
                 {
-                    pattern:/^[^0-9]+$/,message: '请输入非数字开头的IService域名空间', trigger: 'change'
+                    pattern:/^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$/,message: '请输入非数字或者特殊字符开头的IService域名空间', trigger: 'change'
                 }
             ],                                    
             servicesNamespace: [                  
-                { required: true, message: '请输入非数字开头的Service域名空间', trigger: 'blur'},
+                { required: true, message: '请输入非数字或者特殊字符开头的Service域名空间', trigger: 'blur'},
                 {
-                    pattern:/^[^0-9]+$/,message: '请输入非数字开头的Service域名空间', trigger: 'change'
+                    pattern:/^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$/,message: '请输入非数字或者特殊字符开头的Service域名空间', trigger: 'change'
                 }
             ],                                    
             viewmodelsNamespace: [                
-                { required: true, message: '请输入非数字开头的ViewModels域名空间', trigger: 'blur'},
+                { required: true, message: '请输入非数字或者特殊字符开头的ViewModels域名空间', trigger: 'blur'},
                 {
-                    pattern:/^[^0-9]+$/,message: '请输入非数字开头的ViewModels域名空间', trigger: 'change'
+                    pattern:/^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$/,message: '请输入非数字或者特殊字符开头的ViewModels域名空间', trigger: 'change'
                 }
             ]
         },
@@ -138,10 +140,15 @@ var app = new Vue({
                         that.$message({message:'请先获取数据表结构', type:'error'});
                         return false;
                     }
-                    that.$axios.post(postUrl,that.ruleForm)
+                    that.loading = true;
+                    that.$axios.post(postUrl, that.ruleForm)
                         .then(function(result) {
-
-                    });
+                            that.loading = false;
+                            that.$message({
+                                message:result.data.msg,
+                                type:result.data.success?'success':'error'
+                            });
+                        });
                 } else {
                     that.$message({message:'数据验证失败', type:'error'});
                     return false;

@@ -18,11 +18,33 @@
     </style>
 }
 <div id="container">
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="top" v-loading="loading">
         <el-form-item label="数据库连接：" prop="connectionString">
             <el-input v-model="ruleForm.connectionString" clearable @@input="forceUpdateInput" placeholder="请输入数据库连接字符串">
             </el-input>
         </el-form-item>
+        <el-row>
+            <el-col :span="12">
+                <el-form-item label="文件输出路径：" prop="outputPath">
+                    <el-input v-model="ruleForm.outputPath" clearable @@input="forceUpdateInput">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="命名规则：" prop="isPascalCase" style="text-align: center;">
+                    <el-switch v-model="ruleForm.isPascalCase"
+                               active-text="Pascal命名">
+                    </el-switch>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="WebAPI：" prop="isPascalCase" style="text-align: center;">
+                    <el-switch v-model="ruleForm.generateApiController"
+                               active-text="生成APIController">
+                    </el-switch>
+                </el-form-item>
+            </el-col>
+        </el-row>
         <el-row>
             <el-col :span="12">
                 <el-form-item label="项目名称：" prop="solutionName">
@@ -31,8 +53,8 @@
                 </el-form-item>
             </el-col>
             <el-col :span="12">
-                <el-form-item label="文件输出路径：" prop="outputPath">
-                    <el-input v-model="ruleForm.outputPath" clearable @@input="forceUpdateInput">
+                <el-form-item label="Controllers Namespace：" prop="controllersNamespace">
+                    <el-input v-model="ruleForm.controllersNamespace" clearable @@input="forceUpdateInput">
                     </el-input>
                 </el-form-item>
             </el-col>
@@ -86,8 +108,7 @@
         </el-form-item>
         <el-form-item prop="tableData">
             <template>
-                <el-table v-loading="loading"
-                          :data="ruleForm.tableData"
+                <el-table :data="ruleForm.tableData"
                           height="500"
                           border
                           style="width: 100%"
@@ -169,8 +190,6 @@
 
 @section Scripts
 {
-    @*<script type="text/javascript" src="~/js/home/index.js">
-        </script>*@
     <script type="text/javascript">
         app.ruleForm.connectionString = '@Configuration.GetConnectionString("MsSqlServer")';
     </script>
