@@ -24,49 +24,27 @@
             </el-input>
         </el-form-item>
         <el-row>
-            <el-col :span="12">
-                <el-form-item label="文件输出路径：" prop="outputPath">
-                    <el-input v-model="ruleForm.outputPath" clearable @@input="forceUpdateInput">
-                    </el-input>
-                </el-form-item>
-            </el-col>
             <el-col :span="6">
-                <el-form-item label="命名规则：" prop="isPascalCase" style="text-align: center;">
-                    <el-switch v-model="ruleForm.isPascalCase"
-                               active-text="Pascal命名">
-                    </el-switch>
-                </el-form-item>
-            </el-col>
-            <el-col :span="6">
-                <el-form-item label="WebAPI：" prop="isPascalCase" style="text-align: center;">
-                    <el-switch v-model="ruleForm.generateApiController"
-                               active-text="生成APIController">
-                    </el-switch>
-                </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="12">
                 <el-form-item label="项目名称：" prop="solutionName">
                     <el-input v-model="ruleForm.solutionName" clearable @@input="forceUpdateInput" placeholder="请输入项目名称">
                     </el-input>
                 </el-form-item>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="6">
                 <el-form-item label="Controllers Namespace：" prop="controllersNamespace">
                     <el-input v-model="ruleForm.controllersNamespace" clearable @@input="forceUpdateInput">
                     </el-input>
                 </el-form-item>
             </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="12">
+        @*</el-row>
+        <el-row>*@
+            <el-col :span="6">
                 <el-form-item label="Models Namespace：" prop="modelsNamespace">
                     <el-input v-model="ruleForm.modelsNamespace" clearable @@input="forceUpdateInput">
                     </el-input>
                 </el-form-item>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="6">
                 <el-form-item label="ViewModels Namespace：" prop="viewmodelsNamespace">
                     <el-input v-model="ruleForm.viewmodelsNamespace" clearable @@input="forceUpdateInput">
                     </el-input>
@@ -74,38 +52,63 @@
             </el-col>
         </el-row>
         <el-row>
-            <el-col :span="12">
+            <el-col :span="6">
                 <el-form-item label="IRepositories Namespace：" prop="iRepositoriesNamespace">
                     <el-input v-model="ruleForm.iRepositoriesNamespace" clearable @@input="forceUpdateInput">
                     </el-input>
                 </el-form-item>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="6">
                 <el-form-item label="Repositories Namespace：" prop="repositoriesNamespace">
                     <el-input v-model="ruleForm.repositoriesNamespace" clearable @@input="forceUpdateInput">
                     </el-input>
                 </el-form-item>
             </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="12">
+            @*</el-row>
+        <el-row>*@
+            <el-col :span="6">
                 <el-form-item label="IServices Namespace：" prop="iServicesNamespace">
                     <el-input v-model="ruleForm.iServicesNamespace" clearable @@input="forceUpdateInput">
                     </el-input>
                 </el-form-item>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="6">
                 <el-form-item label="Services Namespace：" prop="servicesNamespace">
                     <el-input v-model="ruleForm.servicesNamespace" clearable @@input="forceUpdateInput">
                     </el-input>
                 </el-form-item>
             </el-col>
         </el-row>
-        <el-form-item style="text-align: center;">
-            <el-button icon="el-icon-connection" type="success" @@click="connectDatabase('@Url.Action("GetDataTables")');">获取表结构</el-button>
-            <el-button icon="el-icon-download" type="success" @@click="submitForm('@Url.Action("Generate")')">一键生成</el-button>
-            <el-button @@click="resetForm('ruleForm')" icon="el-icon-refresh-left" type="warning">重置</el-button>
-        </el-form-item>
+        <el-row>
+            <el-col :span="6">
+                <el-form-item label="文件输出路径：" prop="outputPath">
+                    <el-input v-model="ruleForm.outputPath" clearable @@input="forceUpdateInput">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="5">
+                <el-form-item label="命名规则：" prop="isPascalCase" style="text-align: center;">
+                    <el-switch v-model="ruleForm.isPascalCase"
+                               active-text="Pascal命名">
+                    </el-switch>
+                </el-form-item>
+            </el-col>
+            <el-col :span="5">
+                <el-form-item label="WebAPI：" prop="isPascalCase" style="text-align: center;">
+                    <el-switch v-model="ruleForm.generateApiController"
+                               active-text="生成APIController">
+                    </el-switch>
+                </el-form-item>
+            </el-col>
+            <el-col :span="8">
+                <el-form-item style="text-align: center;" label="操作栏">
+                    <el-button icon="el-icon-connection" type="success" @@click="connectDatabase('@Url.Action("GetDataTables")');">获取表结构</el-button>
+                    <el-button icon="el-icon-download" type="success" @@click="submitForm('@Url.Action("Generate")')">一键生成</el-button>
+                    <el-button @@click="resetForm('ruleForm')" icon="el-icon-refresh-left" type="warning">重置</el-button>
+                </el-form-item>
+            </el-col>
+        </el-row>
+
         <el-form-item prop="tableData">
             <template>
                 <el-table :data="ruleForm.tableData"
