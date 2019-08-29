@@ -1,2 +1,2 @@
 # CodeGenerator
-a code generator tool using Zxw.Framework.NetCore.
+a code generator tool using Zxw.Framework.NetCore and Element-UI.
