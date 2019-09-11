@@ -144,10 +144,14 @@ var app = new Vue({
                     that.$axios.post(postUrl, that.ruleForm)
                         .then(function(result) {
                             that.loading = false;
-                            that.$message({
-                                message:result.data.msg,
-                                type:result.data.success?'success':'error'
-                            });
+                            if (result.data.success) {
+                                location.href = result.data.rows;
+                            } else {
+                                that.$message({
+                                    message: result.data.msg,
+                                    type: result.data.success ? 'success' : 'error'
+                                });
+                            }
                         });
                 } else {
                     that.$message({message:'数据验证失败', type:'error'});

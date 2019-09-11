@@ -80,7 +80,7 @@
             </el-col>
         </el-row>
         <el-row>
-            <el-col :span="6">
+            <el-col :span="6" style="display: none;">
                 <el-form-item label="文件输出路径：" prop="outputPath">
                     <el-input v-model="ruleForm.outputPath" clearable @@input="forceUpdateInput">
                     </el-input>

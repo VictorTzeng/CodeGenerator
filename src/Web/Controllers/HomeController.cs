@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;
 using Zxw.Framework.NetCore.CodeGenerator;
@@ -53,9 +56,39 @@ namespace Web.Controllers
             {
                 var instance = new CodeGenerator(input);
                 instance.Generate(input.TableData, true);
-                return Json(ExcutedResult.SuccessResult("生成成功"));
+
+                var zipFileName = GetZipFile();
+                //var file =new FileInfo(zipFileName);
+                //var bytes = new byte[file.Length];
+                //var stream = file.OpenRead();
+                //stream.Read(bytes, 0, Convert.ToInt32(file.Length));
+                //stream.Close();
+                //return File(bytes, "application/x-zip-compressed");
+                return Json(ExcutedResult.SuccessResult(rows:"/zips/" + Path.GetFileName(zipFileName)));
             }
             return Json(ExcutedResult.SuccessResult("数据验证失败，请检查后重试"));
         }
+
+        private string GetZipFile()
+        {
+            var host = GetService<IHostingEnvironment>();
+            var zipPath = Path.Combine(host.WebRootPath, "zips");
+            var zipFileName = Path.Combine(zipPath, Guid.NewGuid().ToString("N") + ".zip");
+            foreach (var file in Directory.GetFiles(zipPath))
+            {
+                System.IO.File.Delete(file);
+            }
+
+            ZipFile.CreateFromDirectory(@"D:\CodeGenerates", zipFileName);
+
+            foreach (var file in Directory.GetFiles(@"D:\CodeGenerates", "*.*", SearchOption.AllDirectories))
+            {
+                System.IO.File.Delete(file);
+            }
+
+            return zipFileName;
+        }
+
+        private T GetService<T>() => (T) HttpContext.RequestServices.GetService(typeof(T));
     }
 }

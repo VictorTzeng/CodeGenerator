@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Zxw.Framework.NetCore.DbContextCore;
 using Zxw.Framework.NetCore.Extensions;
 using Zxw.Framework.NetCore.Filters;
@@ -61,6 +63,15 @@ namespace Web
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+            var zipPath = Path.Combine(env.WebRootPath, "zips");
+            if (!Directory.Exists(zipPath)) Directory.CreateDirectory(zipPath);
+
+            app.UseFileServer(new FileServerOptions()
+            {
+                FileProvider = new PhysicalFileProvider(zipPath),
+                EnableDirectoryBrowsing = false
+            });
 
             app.UseHttpsRedirection()
                 .UseStaticFiles()

@@ -16,12 +16,17 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="Zxw.Framework.NetCore" Version="2.2.2.5" />
+    <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
   </ItemGroup>
 
 
   <ItemGroup>
     <Folder Include="wwwroot\lib\vue\2.6.10\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Zxw.Framework.NetCore\Zxw.Framework.NetCore\Zxw.Framework.NetCore.csproj" />
   </ItemGroup>
 
 </Project>
