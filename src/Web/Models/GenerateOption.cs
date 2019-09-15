@@ -11,6 +11,8 @@ namespace Web.Models
     public class GenerateOption:CodeGenerateOption
     {
         [Required]
+        public string ConnectionString { get; set; }
+        [Required]
         public override string OutputPath { get; set; }
         [Required,RegularExpression(@"^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$")]
         public override string ModelsNamespace { get; set; }

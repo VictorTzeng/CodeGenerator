@@ -23,7 +23,9 @@ var app = new Vue({
             servicesNamespace: '',
             generateApiController:false,
             isPascalCase:true,
-            tableData: []
+            tableData: [],
+            keepPrefix:true,
+            prefixes:''
         },
         rules: {
             connectionString: [
@@ -104,28 +106,28 @@ var app = new Vue({
         },
         connectDatabase: function(url) {
             var that = app.ruleForm;
-            if (!that.connectionString || that.connectionString.length === 0) {
-                app.$message("请输入数据库连接字符串");
-                return;
-            }
-            app.loading = true;
-            app.$axios.get(url,
-                {
-                    params: {
-                        connectionString: that.connectionString
-                    }
-                }).then(function(result) {
-                app.loading = false;
-                if (result.data) {
-                    if (result.data.success) {
-                        that.tableData = result.data.rows;
-                        app.forceUpdateInput();
-                    } else {
-                        app.$message({
-                            message:result.data.msg,
-                            type:'error'
+            
+            that.$refs["ruleForm"].validate((valid, obj) => {
+                if (valid) {
+                    app.loading = true;
+                    app.$axios.post(url, that)
+                        .then(function(result) {
+                            app.loading = false;
+                            if (result.data.success) {
+                                that.tableData = result.data.rows;
+                                app.forceUpdateInput();
+                            } else {
+                                app.$message({
+                                    message:result.data.msg,
+                                    type:'error'
+                                });
+                            }
                         });
-                    }
+                    
+                }
+                else {
+                    app.$message({message:'数据验证失败', type:'error'});
+                    return false;
                 }
             });
         },

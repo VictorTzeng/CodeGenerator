@@ -36,8 +36,8 @@
                     </el-input>
                 </el-form-item>
             </el-col>
-        @*</el-row>
-        <el-row>*@
+            @*</el-row>
+            <el-row>*@
             <el-col :span="6">
                 <el-form-item label="Models Namespace：" prop="modelsNamespace">
                     <el-input v-model="ruleForm.modelsNamespace" clearable @@input="forceUpdateInput">
@@ -65,7 +65,7 @@
                 </el-form-item>
             </el-col>
             @*</el-row>
-        <el-row>*@
+            <el-row>*@
             <el-col :span="6">
                 <el-form-item label="IServices Namespace：" prop="iServicesNamespace">
                     <el-input v-model="ruleForm.iServicesNamespace" clearable @@input="forceUpdateInput">
@@ -80,31 +80,43 @@
             </el-col>
         </el-row>
         <el-row>
-            <el-col :span="6" style="display: none;">
-                <el-form-item label="文件输出路径：" prop="outputPath">
-                    <el-input v-model="ruleForm.outputPath" clearable @@input="forceUpdateInput">
-                    </el-input>
+            <el-col :span="6">
+                <el-form-item label="保留前后缀：" prop="keepPrefix">
+                    <el-switch v-model="ruleForm.keepPrefix"
+                               active-text="是"
+                               inactive-text="否">
+                    </el-switch>
                 </el-form-item>
             </el-col>
-            <el-col :span="5">
-                <el-form-item label="命名规则：" prop="isPascalCase" style="text-align: center;">
+            <el-col :span="6">
+                <el-form-item label="Pascal命名：" prop="isPascalCase">
                     <el-switch v-model="ruleForm.isPascalCase"
-                               active-text="Pascal命名">
+                               active-text="是"
+                               inactive-text="否">
                     </el-switch>
                 </el-form-item>
             </el-col>
-            <el-col :span="5">
-                <el-form-item label="WebAPI：" prop="isPascalCase" style="text-align: center;">
+            <el-col :span="6">
+                <el-form-item label="生成WebAPI：" prop="isPascalCase">
                     <el-switch v-model="ruleForm.generateApiController"
-                               active-text="生成APIController">
+                               active-text="是"
+                               inactive-text="否">
                     </el-switch>
                 </el-form-item>
             </el-col>
-            <el-col :span="8">
-                <el-form-item style="text-align: center;" label="操作栏">
+            <el-col :span="6">
+                <el-form-item label="操作栏">
                     <el-button icon="el-icon-connection" type="success" @@click="connectDatabase('@Url.Action("GetDataTables")');">获取表结构</el-button>
                     <el-button icon="el-icon-download" type="success" @@click="submitForm('@Url.Action("Generate")')">一键生成</el-button>
                     <el-button @@click="resetForm('ruleForm')" icon="el-icon-refresh-left" type="warning">重置</el-button>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row v-if="!ruleForm.keepPrefix">
+            <el-col :span="24">
+                <el-form-item label="前缀列表(多个用逗号分割)" prop="prefixes">
+                    <el-input v-model="ruleForm.prefixes" clearable @@input="forceUpdateInput">
+                    </el-input>
                 </el-form-item>
             </el-col>
         </el-row>

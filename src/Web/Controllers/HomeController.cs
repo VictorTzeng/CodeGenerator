@@ -4,8 +4,10 @@ using System.IO;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis.Extensions.Core.Extensions;
 using Web.Models;
 using Zxw.Framework.NetCore.CodeGenerator;
+using Zxw.Framework.NetCore.CodeGenerator.DbFirst;
 using Zxw.Framework.NetCore.DbContextCore;
 using Zxw.Framework.NetCore.Extensions;
 using Zxw.Framework.NetCore.Models;
@@ -31,16 +33,23 @@ namespace Web.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        [HttpGet]
-        public IActionResult GetDataTables(string connectionString)
+        [HttpPost]
+        public IActionResult GetDataTables([FromBody]GenerateOption input)
         {
             try
             {
                 var dbContext = new SqlServerDbContext(new DbContextOption()
                 {
-                    ConnectionString = connectionString
+                    ConnectionString = input.ConnectionString
                 });
                 var dts = dbContext.GetCurrentDatabaseTableList();
+
+                var instance = new CodeGenerator(input);
+                dts?.ForEach(x =>
+                {
+                    var tmp = instance.DealTablePrefix(x);
+                    x.Alias = tmp.Alias;
+                });
                 return Json(ExcutedResult.SuccessResult(dts));
             }
             catch (Exception e)
