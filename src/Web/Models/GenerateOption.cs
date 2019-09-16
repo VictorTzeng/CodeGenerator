@@ -30,5 +30,8 @@ namespace Web.Models
         public override string ServicesNamespace { get; set; }
         [Required]
         public List<DbTable> TableData { get; set; }
+
+        public bool KeepPrefix { get; set; } = true;
+        public string Prefixes { get; set; }
     }
 }

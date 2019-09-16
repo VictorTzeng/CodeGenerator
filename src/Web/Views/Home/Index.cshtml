@@ -178,6 +178,15 @@
                                      label="表名"
                                      width="300">
                     </el-table-column>
+                    <el-table-column prop="alias"
+                                     label="别名"
+                                     width="300">
+                        <template slot-scope="scope">
+                            <el-input clearable @@input="forceUpdateInput" v-model="scope.row.alias">
+
+                            </el-input>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="tableComment"
                                      label="描述">
                         <template slot-scope="scope">

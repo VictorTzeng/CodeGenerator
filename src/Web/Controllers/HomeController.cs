@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis.Extensions.Core.Extensions;
@@ -44,11 +45,25 @@ namespace Web.Controllers
                 });
                 var dts = dbContext.GetCurrentDatabaseTableList();
 
-                var instance = new CodeGenerator(input);
                 dts?.ForEach(x =>
                 {
-                    var tmp = instance.DealTablePrefix(x);
-                    x.Alias = tmp.Alias;
+                    if (!input.KeepPrefix && !input.Prefixes.IsNullOrWhiteSpace())
+                    {
+                        var prefixes = input.Prefixes.Split(',');
+                        foreach (var prefix in prefixes)
+                        {
+                            if (x.TableName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                            {
+                                x.Alias = x.TableName.Replace(prefix, "", StringComparison.OrdinalIgnoreCase);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (input.IsPascalCase)
+                    {
+                        x.Alias = (x.Alias.IsNullOrEmpty()?x.TableName:x.Alias).ToPascalCase();
+                    }
                 });
                 return Json(ExcutedResult.SuccessResult(dts));
             }

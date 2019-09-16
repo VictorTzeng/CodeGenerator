@@ -107,7 +107,7 @@ var app = new Vue({
         connectDatabase: function(url) {
             var that = app.ruleForm;
             
-            that.$refs["ruleForm"].validate((valid, obj) => {
+            app.$refs["ruleForm"].validate((valid, obj) => {
                 if (valid) {
                     app.loading = true;
                     app.$axios.post(url, that)
