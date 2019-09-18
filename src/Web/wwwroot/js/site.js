@@ -25,7 +25,26 @@ var app = new Vue({
             isPascalCase:true,
             tableData: [],
             keepPrefix:true,
-            prefixes:''
+            prefixes:'',
+            dbType:0,//默认MS SqlServer
+            dbList:[
+                {
+                    label:'SQLServer',
+                    value:0
+                },
+                {
+                    label:"MySQL",
+                    value:1
+                },
+                {
+                    label:"PostgreSQL",
+                    value:2
+                },
+                {
+                    label:"Oracle",
+                    value:5
+                }
+                ]
         },
         rules: {
             connectionString: [

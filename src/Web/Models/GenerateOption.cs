@@ -33,5 +33,6 @@ namespace Web.Models
 
         public bool KeepPrefix { get; set; } = true;
         public string Prefixes { get; set; }
+        public DatabaseType DbType { get; set; } = DatabaseType.MSSQL;
     }
 }

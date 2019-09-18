@@ -11,6 +11,8 @@ using Zxw.Framework.NetCore.CodeGenerator;
 using Zxw.Framework.NetCore.CodeGenerator.DbFirst;
 using Zxw.Framework.NetCore.DbContextCore;
 using Zxw.Framework.NetCore.Extensions;
+using Zxw.Framework.NetCore.Helpers;
+using Zxw.Framework.NetCore.IDbContext;
 using Zxw.Framework.NetCore.Models;
 using Zxw.Framework.NetCore.Options;
 
@@ -39,10 +41,34 @@ namespace Web.Controllers
         {
             try
             {
-                var dbContext = new SqlServerDbContext(new DbContextOption()
+                IDbContextCore dbContext;
+                switch (input.DbType)
                 {
-                    ConnectionString = input.ConnectionString
-                });
+                    case DatabaseType.MySQL:
+                        dbContext = new MySqlDbContext(new DbContextOption()
+                        {
+                            ConnectionString = input.ConnectionString
+                        });
+                        break;
+                    case DatabaseType.PostgreSQL:
+                        dbContext = new PostgreSQLDbContext(new DbContextOption()
+                        {
+                            ConnectionString = input.ConnectionString
+                        });
+                        break;
+                    case DatabaseType.Oracle:
+                        dbContext = new OracleDbContext(new DbContextOption()
+                        {
+                            ConnectionString = input.ConnectionString
+                        });
+                        break;
+                    default:
+                        dbContext = new SqlServerDbContext(new DbContextOption()
+                        {
+                            ConnectionString = input.ConnectionString
+                        });
+                        break;
+                }
                 var dts = dbContext.GetCurrentDatabaseTableList();
 
                 dts?.ForEach(x =>
@@ -69,6 +95,7 @@ namespace Web.Controllers
             }
             catch (Exception e)
             {
+                Log4NetHelper.WriteError(GetType(), e);
                 return Json(ExcutedResult.FailedResult($"数据库连接失败，具体原因如下：{e.Message}"));
             }
         }

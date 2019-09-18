@@ -19,10 +19,25 @@
 }
 <div id="container">
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="top" v-loading="loading">
-        <el-form-item label="数据库连接：" prop="connectionString">
-            <el-input v-model="ruleForm.connectionString" clearable @@input="forceUpdateInput" placeholder="请输入数据库连接字符串">
-            </el-input>
-        </el-form-item>
+        <el-row>
+            <el-col :span="6">
+                <el-form-item label="数据库类型：" prop="dbType">
+                    <el-select v-model="ruleForm.dbType" placeholder="请选择">
+                        <el-option v-for="item in ruleForm.dbList"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="18">
+                <el-form-item label="数据库连接：" prop="connectionString">
+                    <el-input v-model="ruleForm.connectionString" clearable @@input="forceUpdateInput" placeholder="请输入数据库连接字符串">
+                    </el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
         <el-row>
             <el-col :span="6">
                 <el-form-item label="项目名称：" prop="solutionName">
