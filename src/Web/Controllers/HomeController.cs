@@ -41,34 +41,12 @@ namespace Web.Controllers
         {
             try
             {
-                IDbContextCore dbContext;
-                switch (input.DbType)
+                var option = new DbContextOption()
                 {
-                    case DatabaseType.MySQL:
-                        dbContext = new MySqlDbContext(new DbContextOption()
-                        {
-                            ConnectionString = input.ConnectionString
-                        });
-                        break;
-                    case DatabaseType.PostgreSQL:
-                        dbContext = new PostgreSQLDbContext(new DbContextOption()
-                        {
-                            ConnectionString = input.ConnectionString
-                        });
-                        break;
-                    case DatabaseType.Oracle:
-                        dbContext = new OracleDbContext(new DbContextOption()
-                        {
-                            ConnectionString = input.ConnectionString
-                        });
-                        break;
-                    default:
-                        dbContext = new SqlServerDbContext(new DbContextOption()
-                        {
-                            ConnectionString = input.ConnectionString
-                        });
-                        break;
-                }
+                    ConnectionString = input.ConnectionString,
+                    IsOutputSql = true
+                };
+                var dbContext = GetDbContext(input.DbType, option);
                 var dts = dbContext.GetCurrentDatabaseTableList();
 
                 dts?.ForEach(x =>
@@ -88,7 +66,7 @@ namespace Web.Controllers
 
                     if (input.IsPascalCase)
                     {
-                        x.Alias = (x.Alias.IsNullOrEmpty()?x.TableName:x.Alias).ToPascalCase();
+                        x.Alias = (x.Alias.IsNullOrEmpty() ? x.TableName : x.Alias).ToPascalCase();
                     }
                 });
                 return Json(ExcutedResult.SuccessResult(dts));
@@ -98,6 +76,28 @@ namespace Web.Controllers
                 Log4NetHelper.WriteError(GetType(), e);
                 return Json(ExcutedResult.FailedResult($"数据库连接失败，具体原因如下：{e.Message}"));
             }
+        }
+
+        private IDbContextCore GetDbContext(DatabaseType dbType, DbContextOption option)
+        {
+            IDbContextCore dbContext;
+            switch (dbType)
+            {
+                case DatabaseType.MySQL:
+                    dbContext = new MySqlDbContext(option);
+                    break;
+                case DatabaseType.PostgreSQL:
+                    dbContext = new PostgreSQLDbContext(option);
+                    break;
+                case DatabaseType.Oracle:
+                    dbContext = new OracleDbContext(option);
+                    break;
+                default:
+                    dbContext = new SqlServerDbContext(option);
+                    break;
+            }
+
+            return dbContext;
         }
 
         [HttpPost]
@@ -141,5 +141,37 @@ namespace Web.Controllers
         }
 
         private T GetService<T>() => (T) HttpContext.RequestServices.GetService(typeof(T));
+
+        [HttpPost]
+        public IActionResult PascalRename([FromBody]GenerateOption input)
+        {
+            if (input.TableData != null)
+            {
+                foreach(var item in input.TableData)
+                {
+                    if (item.Alias.IsNullOrEmpty())
+                    {
+                        item.Alias = input.IsPascalCase?item.TableName.ToPascalCase():item.TableName;
+                    }
+                    else
+                    {
+                        item.Alias = input.IsPascalCase?item.Alias.ToPascalCase():item.TableName;
+                    }
+
+                    foreach(var x in item.Columns)
+                    {
+                        if (x.Alias.IsNullOrEmpty())
+                        {
+                            x.Alias = input.IsPascalCase?x.ColName.ToPascalCase():x.ColName;
+                        }
+                        else
+                        {
+                            x.Alias = input.IsPascalCase?x.Alias.ToPascalCase():x.Alias;
+                        }
+                    }
+                }
+            }
+            return Json(ExcutedResult.SuccessResult(input.TableData));
+        }
     }
 }

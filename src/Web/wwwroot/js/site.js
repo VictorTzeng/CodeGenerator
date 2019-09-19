@@ -183,6 +183,21 @@ var app = new Vue({
         },
         resetForm() {
             this.$refs["ruleForm"].resetFields();
+        },
+        pascalRename(url) {
+            app.$axios.post(url, app.ruleForm)
+                .then(function(result) {
+                    app.loading = false;
+                    if (result.data.success) {
+                        app.ruleForm.tableData = result.data.rows;
+                        app.forceUpdateInput();
+                    } else {
+                        app.$message({
+                            message: result.data.msg,
+                            type: result.data.success ? 'success' : 'error'
+                        });
+                    }
+                });
         }
     },
     watch: {
