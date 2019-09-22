@@ -6,6 +6,7 @@
 @inject IConfiguration Configuration
 
 @section Styles{
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style type="text/css">
         .el-input-group__prepend {
             width: 220px !important;
@@ -18,7 +19,10 @@
     </style>
 }
 <div id="container">
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="top" v-loading="loading">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="top" v-loading="loading"
+             element-loading-text="拼命加载中......"
+             element-loading-spinner="el-icon-loading"
+             element-loading-background="rgba(0, 0, 0, 0.8)">
         <el-row>
             <el-col :span="6">
                 <el-form-item label="数据库类型：" prop="dbType">
@@ -52,7 +56,7 @@
                 </el-form-item>
             </el-col>
             @*</el-row>
-            <el-row>*@
+                <el-row>*@
             <el-col :span="6">
                 <el-form-item label="Models Namespace：" prop="modelsNamespace">
                     <el-input v-model="ruleForm.modelsNamespace" clearable @@input="forceUpdateInput">
@@ -80,7 +84,7 @@
                 </el-form-item>
             </el-col>
             @*</el-row>
-            <el-row>*@
+                <el-row>*@
             <el-col :span="6">
                 <el-form-item label="IServices Namespace：" prop="iServicesNamespace">
                     <el-input v-model="ruleForm.iServicesNamespace" clearable @@input="forceUpdateInput">
@@ -96,7 +100,7 @@
         </el-row>
         <el-row>
             <el-col :span="6">
-                <el-form-item label="保留前后缀：" prop="keepPrefix">
+                <el-form-item label="保留表名前缀：" prop="keepPrefix">
                     <el-switch v-model="ruleForm.keepPrefix"
                                active-text="是"
                                inactive-text="否">
@@ -220,12 +224,18 @@
                         </template>
                     </el-table-column>
                     <el-table-column label="操作"
-                                     width="120">
+                                     width="200">
                         <template slot-scope="scope">
                             <el-tooltip effect="dark" content="移除" placement="top">
                                 <el-button @@click.native.prevent="deleteRow(scope.$index, tableData)"
                                            type="warning"
                                            size="small" icon="el-icon-delete">
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip effect="dark" content="预览" placement="top">
+                                <el-button @@click.native.prevent="preview(scope.$index,'@Url.Action("Preview")');"
+                                           type="warning"
+                                           size="small" icon="el-icon-search">
                                 </el-button>
                             </el-tooltip>
                         </template>
@@ -235,10 +245,67 @@
         </el-form-item>
     </el-form>
 </div>
+<el-dialog v-if="fileItems!=null" :title="fileItems.table+' - 代码预览'"
+           :visible.sync="dialogVisible"
+           width="60%">
+    <template>
+        <el-tabs value="1"
+                 type="card">
+            <el-tab-pane :label="fileItems.model.name" name="1">
+                <el-input
+                    type="textarea"
+                    :rows="30"
+                    readonly="false"
+                    v-model="fileItems.model.content">
+                </el-input>
+            </el-tab-pane>
+            <el-tab-pane :label="fileItems.irepository.name" name="2">
+                <el-input type="textarea"
+                          :rows="30"
+                          readonly="false"
+                          v-model="fileItems.irepository.content">
+                </el-input>
+            </el-tab-pane>
+            <el-tab-pane :label="fileItems.repository.name" name="3">
+                <el-input type="textarea"
+                          :rows="30"
+                          readonly="false"
+                          v-model="fileItems.repository.content">
+                </el-input>
+            </el-tab-pane>
+            <el-tab-pane :label="fileItems.iservice.name" name="4">
+                <el-input type="textarea"
+                          :rows="30"
+                          readonly="false"
+                          v-model="fileItems.iservice.content">
+                </el-input>
+            </el-tab-pane>
+            <el-tab-pane :label="fileItems.service.name" name="5">
+                <el-input type="textarea"
+                          :rows="30"
+                          readonly="false"
+                          v-model="fileItems.service.content">
+                </el-input>
+            </el-tab-pane>
+            <el-tab-pane :label="fileItems.controller.name" name="6">
+                <el-input type="textarea"
+                          :rows="30"
+                          readonly="false"
+                          v-model="fileItems.controller.content">
+                </el-input>
+            </el-tab-pane>
+        </el-tabs>
+    </template>
+</el-dialog>
 
 @section Scripts
 {
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script type="text/javascript">
         app.ruleForm.connectionString = '@Configuration.GetConnectionString("MsSqlServer")';
+        var quill = new Quill('#editor', {
+            theme: 'snow'
+        });
+
     </script>
 }

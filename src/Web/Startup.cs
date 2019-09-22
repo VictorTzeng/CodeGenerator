@@ -60,7 +60,7 @@ namespace Web
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler();
                 app.UseHsts();
             }
 

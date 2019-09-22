@@ -10,6 +10,8 @@ var app = new Vue({
         showOrHideMenuIcon: 'el-icon-s-fold',
         showOrHideMenuTitle: '收起',
         asideClass: 'aside-expand',
+        fileItems:null,
+        dialogVisible:false,
         ruleForm: {
             connectionString: '',
             outputPath: 'D:\\CodeGenerates',
@@ -192,6 +194,23 @@ var app = new Vue({
                         app.ruleForm.tableData = result.data.rows;
                         app.forceUpdateInput();
                     } else {
+                        app.$message({
+                            message: result.data.msg,
+                            type: result.data.success ? 'success' : 'error'
+                        });
+                    }
+                });
+        },
+        preview(i, url) {
+            console.log(i);
+            app.$axios.post(url+'?index='+i, app.ruleForm)
+                .then(function(result) {
+                    app.loading = false;
+                    if (result.data.success) {
+                        app.fileItems = result.data.rows;
+                        app.dialogVisible = true;
+                    } else {
+                        app.dialogVisible = false;
                         app.$message({
                             message: result.data.msg,
                             type: result.data.success ? 'success' : 'error'

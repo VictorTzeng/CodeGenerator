@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Castle.Core.Internal;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -47,9 +49,9 @@ namespace Web.Controllers
                     IsOutputSql = true
                 };
                 var dbContext = GetDbContext(input.DbType, option);
-                var dts = dbContext.GetCurrentDatabaseTableList();
+                var tables = dbContext.GetCurrentDatabaseTableList().Where(m=>m.Columns.Any(n=>n.IsPrimaryKey)).ToList();
 
-                dts?.ForEach(x =>
+                tables?.ForEach(x =>
                 {
                     if (!input.KeepPrefix && !input.Prefixes.IsNullOrWhiteSpace())
                     {
@@ -68,8 +70,13 @@ namespace Web.Controllers
                     {
                         x.Alias = (x.Alias.IsNullOrEmpty() ? x.TableName : x.Alias).ToPascalCase();
                     }
+
+                    foreach (var column in x.Columns)
+                    {
+                        column.Alias = input.IsPascalCase ? column.ColName.ToPascalCase() : column.ColName;
+                    }
                 });
-                return Json(ExcutedResult.SuccessResult(dts));
+                return Json(ExcutedResult.SuccessResult(tables));
             }
             catch (Exception e)
             {
@@ -105,8 +112,10 @@ namespace Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var instance = new CodeGenerator(input);
-                instance.Generate(input.TableData, true);
+                var generator = new CodeGenerator(input);
+
+                var tables = input.TableData;
+                generator.Generate(tables, true);
 
                 var zipFileName = GetZipFile();
                 //var file =new FileInfo(zipFileName);
@@ -166,12 +175,60 @@ namespace Web.Controllers
                         }
                         else
                         {
-                            x.Alias = input.IsPascalCase?x.Alias.ToPascalCase():x.Alias;
+                            x.Alias = input.IsPascalCase?x.Alias.ToPascalCase():x.ColName;
                         }
                     }
                 }
             }
-            return Json(ExcutedResult.SuccessResult(input.TableData));
+            var tables = input.TableData;
+            return Json(ExcutedResult.SuccessResult(tables));
+        }
+
+        [HttpPost]
+        public IActionResult Preview(int index, [FromBody] GenerateOption option)
+        {
+            var generator = new CodeGenerator(option);
+
+            var table = option.TableData[index];
+
+            generator.Generate(new List<DbTable>() {table}, true);
+            var tableName = table.TableName;
+            var className = table.Alias.IsNullOrEmpty() ? tableName : table.Alias;
+
+            return Json(ExcutedResult.SuccessResult(new
+            {
+                table = tableName,
+                model = new
+                {
+                    content = generator.ReadFile("Models", tableName + ".cs"),
+                    name = tableName + ".cs"
+                },
+                irepository = new
+                {
+                    content = generator.ReadFile("IRepositories", $"I{className}Repository.cs"),
+                    name = $"I{className}Repository.cs"
+                },
+                repository = new
+                {
+                    content = generator.ReadFile("Repositories", $"{className}Repository.cs"),
+                    name = $"{className}Repository.cs"
+                },
+                iservice = new
+                {
+                    content = generator.ReadFile("IServices", $"I{className}Service.cs"),
+                    name = $"I{className}Service.cs"
+                },
+                service = new
+                {
+                    content = generator.ReadFile("Services", $"{className}Service.cs"),
+                    name = $"{className}Service.cs"
+                },
+                controller = new
+                {
+                    content = generator.ReadFile("Controllers", $"{className}Controller.cs"),
+                    name = $"{className}Controller.cs"
+                }
+            }));
         }
     }
 }
