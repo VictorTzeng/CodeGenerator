@@ -227,7 +227,7 @@
                                      width="200">
                         <template slot-scope="scope">
                             <el-tooltip effect="dark" content="移除" placement="top">
-                                <el-button @@click.native.prevent="deleteRow(scope.$index, tableData)"
+                                <el-button @@click.native.prevent="deleteRow(scope.$index, ruleForm.tableData)"
                                            type="warning"
                                            size="small" icon="el-icon-delete">
                                 </el-button>
