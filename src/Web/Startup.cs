@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Zxw.Framework.NetCore.DbContextCore;
 using Zxw.Framework.NetCore.Extensions;
 using Zxw.Framework.NetCore.Filters;
@@ -39,7 +40,7 @@ namespace Web
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -47,20 +48,20 @@ namespace Web
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-            return InitIoC(services);
+            InitIoC(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == "Development")
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler();
+                app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
 
@@ -73,16 +74,24 @@ namespace Web
                 EnableDirectoryBrowsing = false
             });
 
-            app.UseHttpsRedirection()
-                .UseStaticFiles()
-                .UseCookiePolicy()
-                .UseAuthentication()
-                .UseMvc(routes =>
-                {
-                    routes.MapRoute(
-                        name: "default",
-                        template: "{controller=Home}/{action=Index}/{id?}");
-                });
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseCors();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseCookiePolicy(new CookiePolicyOptions()
+            {
+                CheckConsentNeeded = context => true,
+                MinimumSameSitePolicy = SameSiteMode.None
+            });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
+                endpoints.MapControllers();
+            });
         }
 
         /// <summary>
@@ -94,7 +103,7 @@ namespace Web
         {
             services.AddOptions();
             services.AddMvc(option => { option.Filters.Add(new GlobalExceptionFilter()); })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddControllersAsServices();
 
             return AspectCoreContainer.BuildServiceProvider(services); //接入AspectCore.Injector

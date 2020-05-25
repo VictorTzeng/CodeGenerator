@@ -131,7 +131,7 @@ namespace Web.Controllers
 
         private string GetZipFile()
         {
-            var host = GetService<IHostingEnvironment>();
+            var host = GetService<IWebHostEnvironment>();
             var zipPath = Path.Combine(host.WebRootPath, "zips");
             var zipFileName = Path.Combine(zipPath, Guid.NewGuid().ToString("N") + ".zip");
             foreach (var file in Directory.GetFiles(zipPath))

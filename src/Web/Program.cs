@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using AspectCore.Extensions.Hosting;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 
 namespace Web
 {
@@ -14,11 +8,23 @@ namespace Web
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .UseServiceContext()
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseKestrel(config =>
+                    {
+                        config.ListenAnyIP(80);
+                    })
+                    //.ConfigureAppConfiguration((context, config) =>
+                    //{
+                    //    // Configure the app here.
+                    //})
+                    .UseStartup<Startup>();
+                });
     }
 }
